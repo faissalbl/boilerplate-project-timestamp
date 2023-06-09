@@ -19,19 +19,33 @@ app.get("/", function (req, res) {
 });
 
 
-app.get("/api/:date", function (req, res) {
+app.get("/api/:date?", function (req, res) {
   const dateStr = req.params.date;
-  const seconds = Number(dateStr);
+
   let date;
-  if (isNaN(seconds)) {
-    date = new Date(dateStr);
+  if (!dateStr) {
+    date = new Date();    
   } else {
-    date = new Date(seconds);
+    const seconds = Number(dateStr);
+    if (isNaN(seconds)) {
+      date = new Date(dateStr);
+    } else {
+      date = new Date(seconds);
+    }
   }
-  const result = {
-    unix: date.getTime(),
-    utc: date.toUTCString(),
-  };
+  
+  let result;
+
+  // invalid date
+  if (isNaN(date.getTime())) {
+    result = { error : "Invalid Date" };
+  } else {
+    result = {
+      unix: date.getTime(),
+      utc: date.toUTCString(),
+    };
+  }
+
   res.json(result);
 });
 
